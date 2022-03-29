@@ -1,0 +1,103 @@
+require(["/Content/scripts/config/config.js"], function () {
+    require(['login.index']);
+})
+, define("login.index", ['jquery', 'geoCommon', 'geoDialog', 'geoForm', 'geoDataGrid1', 'geoTree', 'layout', 'geoSplitScreen'], function () {
+    window.DataOperation = {
+        //初始化
+        init: function () {
+            var that = this;
+            that.loadTreeData();
+            var url = "/GeoMap/Home/Index?viewerType=gisViewer&amp;admin=true";
+            /// var url = "/GeoMapSite/WebContent/Apps/MapIndex/WarningInfoMap.html?viewerType=gisViewer&admin=true";  //&lineId=Id(5b1e957f8470a716b812c11c)
+            $("#WarningInfoMapFrame").attr("src", url);
+            that.showDetail = false;
+            $(window).resize(function () {
+                // that.dataGrid.dataGrid.setGridHeight($(window).height() - 170);
+            });
+        },
+        //加载单位树数据
+        loadTreeData: function () {
+            var that = this;
+            geoCommon.ajaxJson({
+                postUrl: 'api/MonitorDevice/GetLineWorkUnitWorkPointTree',
+                sendType: 'GET'
+            }, function (data) {
+                var nodeData = JSON.parse(JSON.stringify(data).replace(/Name/g, "name").replace(/Children/g, "children"));
+                that.recursiveTerr(nodeData, 0, 1);
+                that.geoTree = $("#tree_UnitList").geoTree({
+                    data: nodeData,
+                    setting: {
+                        callback: {
+                            onClick: that.onTreeClick,
+                            onRightClick: that.onTreeRightClick,
+                            params: { obj: that }
+                        },
+                        view: {
+                            nameIsHTML: true,
+                            showIcon: false,
+                            showLine: false
+                        }
+                    },
+                    //  expandAll: false
+                })
+            });
+        },
+        //tree点击事件
+        onTreeClick: function (event, treeId, treeNode, clickFlag, params) {
+            var that = params.obj;
+            DataOperation.getFloorIdsByWpId(treeNode.Id)
+        },
+        getFloorIdsByWpId: function (wpId) {
+            var that = this;
+            geoCommon.ajaxJson({
+                postUrl: 'api/MonitorDevice/GetFloorIdsByWpId?workPointId=' + wpId,
+                sendType: 'GET'
+            }, function (data) {
+                if (data && data.length > 0) {
+                    var obj = document.getElementById("WarningInfoMapFrame");
+                    obj.contentWindow.goFloorMap(data[0]);
+                }
+            });
+        },
+        //递归展开数节点
+        recursiveTerr: function (nodeData, nodecont, lev) {
+            var that = this;
+            for (var j = 0; j < nodeData.length; j++) {
+                nodeData[j].open = true;
+                if (lev <= nodecont) {
+                    lev++;
+                    that.recursiveTerr(nodeData[j].children, nodecont, lev)
+                }
+            }
+        },
+        /**
+		 *  单独选中根节点中第一个节点
+		 */
+        selectNodes: function (treeName) {
+            var treeObj = $.fn.zTree.getZTreeObj(treeName);
+            //获取节点
+            var nodes = treeObj.getNodes();
+            if (nodes.length > 0) {
+                var node = treeObj.selectNode(nodes[0]);
+            }
+        },
+        //刷新数据
+        refreshData: function () {
+            var that = this;
+            DataOperation.dataGrid.querySettings = that.getQueryParams();
+            DataOperation.dataGrid.reloadData();
+        },
+        getSplitDetail: function (code, name, updateTime) {
+            $("#Mapdiv").css("height", "60%");
+            $("#PmdetailDiv").show().css("height", "40%");
+            $("#divCenter").css("overflow", "hidden");
+            $("#Pmdetail").attr("src", "/EES/EnvironmentMonitor/DeviceInfoDetail?monitorDeviceId=" + code + "&monitorDeviceName=" + name + "&updateTime=" + updateTime);
+            DataOperation.showDetail = true;
+        },
+        resetSplit: function () {
+            $("#PmdetailDiv").hide();
+            $("#Mapdiv").css("height", "100%");
+        },
+    };
+    DataOperation.init();
+});

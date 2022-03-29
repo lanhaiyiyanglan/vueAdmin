@@ -1,0 +1,38 @@
+Id(5b1e957f8470a716b812c11c)//线路id
+businessId: Id(5b231a038470a714a07b8bce)//分部id
+Id(5b4f08890fad61176c7a9cad)//分区id
+Id(5b231a4f8470a714a07b8bd2
+Id(5b4f10fa0fad610458860cc9)//工点id
+TypeName: 分部
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>WarningInfoDisplay</title>
+    <link href="~/Content/styles/geoui.css" rel="stylesheet" />
+    <script src="~/Content/thirdparty/requirejs/require.min.js" data-main="/Line3EES/Content/modules/controllers/environmentMonitor/WarningInfoDisplay.js" defer></script>
+
+</head>
+<body class="geoui-body">
+    <div class="geoui-layout">
+        <div class="geoui-layout-left" style="width:340px;top:8px;bottom:12px;height:calc(100vh-16px);overflow:auto;">
+            <ul id="tree_UnitList"></ul>
+        </div>
+        <div class="geoui-layout-center" id="divCenter" style="left:344px;top:8px;bottom:8px;height:calc(100vh-16px);padding:0PX!important;border:none!important;">
+            <div id="Mapdiv" style="width:calc(100%);height:100%;position: absolute;">
+                <iframe id="WarningInfoMapFrame" name="WarningInfoMapFrame" style="width:100%;height:calc(100% - 5px);margin-left: 0px;margin-top:0px;" frameborder="0"></iframe>
+            </div>
+            <div id="PmdetailDiv" style="display:none;position: absolute;width:calc(100%);right:0px;bottom:0px">
+                <iframe id="Pmdetail" name="Pmdetail" style="width:100%;height:100%;margin-left: 0px;margin-top:0;" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
